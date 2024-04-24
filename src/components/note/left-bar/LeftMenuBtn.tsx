@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BsPlusLg } from "react-icons/bs";
 import NotesList from "./NotesList";
+import { Item } from "@/types/Item";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { updateItems } from "@/redux/features/items-slice";
 
 // Type definition
 type LeftMenuBtnProps = {
@@ -14,13 +18,40 @@ export default function LeftMenuBtn({ children }: LeftMenuBtnProps) {
   const [showItems, setShowItems] = useState<boolean>(false);
   const [hovered, setHovered] = useState<boolean>(false);
 
+  // Get items from Redux store
+  const items: Item[] = useSelector(
+    (state: RootState) => state.itemsReducer.value
+  );
+  const dispatch = useDispatch<AppDispatch>();
+
+  useEffect(() => {
+    const storedItems = localStorage.getItem("items");
+    if (storedItems) {
+      dispatch(updateItems(JSON.parse(storedItems)));
+    }
+  }, [dispatch]);
+
   //   Function to toggle visibility of items
   const toggleItems = () => {
     setShowItems(!showItems);
   };
 
   //   Function to handle creating a new item
-  const newItem = () => {};
+  const newItem = () => {
+    const newItem: Item = {
+      id: generateId(),
+      title: "",
+      body: "",
+    };
+
+    // Dispatch action to update Redux store with new items
+    dispatch(updateItems([...items, newItem]));
+    localStorage.setItem("items", JSON.stringify([...items, newItem]));
+  };
+
+  const generateId = (): string => {
+    return Math.random().toString(36).substring(2, 9);
+  };
 
   //   Function to handle mouse entry event
   const handleMouseEntry = () => {
