@@ -4,9 +4,10 @@ import React from "react";
 export default function Note() {
   return (
     <main>
-      <section>
+      {/* <section>
         <NoteDetails />
-      </section>
+      </section> */}
+      <h1>Welcome</h1>
     </main>
   );
 }

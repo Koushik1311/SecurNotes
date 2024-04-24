@@ -1,35 +1,90 @@
 "use client";
 
-import React, { ChangeEvent, useState } from "react";
+import { updateItems } from "@/redux/features/items-slice";
+import { AppDispatch, RootState } from "@/redux/store";
+import { Item } from "@/types/Item";
+import { useParams } from "next/navigation";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-// Type definition
-type NoteDetailType = {
+type ItemsType = {
+  id: string;
   title: string;
   body: string;
 };
 
 export default function NoteDetails() {
+  const { id: noteId } = useParams<{ id: string }>();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Get items from Redux store
+  const items: Item[] = useSelector(
+    (state: RootState) => state.itemsReducer.value
+  );
+
   // States
-  const [noteDetails, setNoteDetails] = useState<NoteDetailType>({
+  const [noteDetails, setNoteDetails] = useState<ItemsType>({
+    id: "",
     title: "",
     body: "",
   });
 
+  useEffect(() => {
+    const item = items.find((item) => item.id === noteId);
+    if (item) {
+      setNoteDetails({
+        id: item.id,
+        title: item.title,
+        body: item.body,
+      });
+    }
+  }, [noteId, items]);
+
   // Function to handle title change
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newTitle = event.target.value;
     setNoteDetails({
       ...noteDetails,
-      title: event.target.value,
+      title: newTitle,
     });
+    dispatch(
+      updateItems(
+        items.map((item) =>
+          item.id === noteId ? { ...item, title: newTitle } : item
+        )
+      )
+    );
   };
 
   // Function to handle body change
   const handleBodyChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const newBody = event.target.value;
     setNoteDetails({
       ...noteDetails,
-      body: event.target.value,
+      body: newBody,
     });
+    dispatch(
+      updateItems(
+        items.map((item) =>
+          item.id === noteId ? { ...item, body: newBody } : item
+        )
+      )
+    );
   };
+
+  // Function to save data to local storage
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem("items") || "[]");
+
+    const index = storedItems.findIndex(
+      (item: ItemsType) => item.id === noteDetails.id
+    );
+
+    if (index !== -1) {
+      storedItems[index] = noteDetails;
+      localStorage.setItem("items", JSON.stringify(storedItems));
+    }
+  }, [noteDetails]);
   return (
     <div>
       {/* Form start */}
