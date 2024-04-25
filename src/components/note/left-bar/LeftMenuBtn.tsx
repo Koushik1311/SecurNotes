@@ -7,6 +7,7 @@ import { Item } from "@/types/Item";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
 import { updateItems } from "@/redux/features/items-slice";
+import { useRouter } from "next/navigation";
 
 // Type definition
 type LeftMenuBtnProps = {
@@ -14,6 +15,8 @@ type LeftMenuBtnProps = {
 };
 
 export default function LeftMenuBtn({ children }: LeftMenuBtnProps) {
+  const router = useRouter();
+
   // Sates
   const [showItems, setShowItems] = useState<boolean>(false);
   const [hovered, setHovered] = useState<boolean>(false);
@@ -43,6 +46,7 @@ export default function LeftMenuBtn({ children }: LeftMenuBtnProps) {
       title: "",
       body: "",
     };
+    router.push(`/note/${newItem.id}`);
 
     // Dispatch action to update Redux store with new items
     dispatch(updateItems([...items, newItem]));
