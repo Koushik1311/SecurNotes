@@ -1,18 +1,21 @@
 "use client";
 
-import { RootState } from "@/redux/store";
+import { updateItems } from "@/redux/features/items-slice";
+import { AppDispatch, RootState } from "@/redux/store";
 import { Item } from "@/types/Item";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { GrMore } from "react-icons/gr";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function TopBar() {
   const { id: noteId } = useParams<{ id: string }>();
+  const router = useRouter();
 
   const items: Item[] = useSelector(
     (state: RootState) => state.itemsReducer.value
   );
+  const dispatch = useDispatch<AppDispatch>();
 
   const [title, setTitle] = useState<string>("");
   const [showMenu, setShowMenu] = useState<boolean>(false);
@@ -33,11 +36,11 @@ export default function TopBar() {
 
   //   Remove item
   const removeItem = () => {
-    const item = items.find((item) => item.id === noteId);
+    const updatedItems = items.filter((item) => item.id !== noteId);
 
-    if (item) {
-      console.log("Item removed");
-    }
+    router.push("/note");
+    dispatch(updateItems(updatedItems));
+    localStorage.setItem("items", JSON.stringify(updatedItems));
   };
 
   return (
@@ -54,7 +57,9 @@ export default function TopBar() {
         </button>
         {showMenu && (
           <div className="absolute w-56 bg-white right-0 top-9 py-4 px-3 rounded-lg shadow-[0px_0px_9px_0px_#00000024,0px_9px_16px_0px_#00000024]">
-            <button className="w-full text-start">Delete</button>
+            <button onClick={removeItem} className="w-full text-start">
+              Delete
+            </button>
           </div>
         )}
       </div>
