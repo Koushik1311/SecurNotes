@@ -6,7 +6,7 @@ export default function NotesLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="w-screen flex flex-row space-x-5">
+    <div className="flex flex-row space-x-5">
       <LeftMenu />
       <div className="border-l border-slate-200" />
       <div className="flex-1">{children}</div>
