@@ -47,7 +47,7 @@ export default function TopBar() {
     <div className="flex flex-row items-center justify-between h-12 mr-5 pl-5">
       {/* Left Title */}
       <div className="text-sm font-normal text-gray-500 w-60 truncate">
-        {title}
+        {title || "Untitled"}
       </div>
 
       {/* Option menu */}
