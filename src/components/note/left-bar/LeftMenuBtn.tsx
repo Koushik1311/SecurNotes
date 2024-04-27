@@ -3,11 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { BsPlusLg } from "react-icons/bs";
 import NotesList from "./NotesList";
-import { Item } from "@/types/Item";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/redux/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/redux/store";
 import { updateItems } from "@/redux/features/items-slice";
-import { useRouter } from "next/navigation";
+import AddItemButton from "@/components/global/AddItemButton";
 
 // Type definition
 type LeftMenuBtnProps = {
@@ -15,16 +14,10 @@ type LeftMenuBtnProps = {
 };
 
 export default function LeftMenuBtn({ children }: LeftMenuBtnProps) {
-  const router = useRouter();
-
   // Sates
-  const [showItems, setShowItems] = useState<boolean>(false);
+  const [showItems, setShowItems] = useState<boolean>(true);
   const [hovered, setHovered] = useState<boolean>(false);
 
-  // Get items from Redux store
-  const items: Item[] = useSelector(
-    (state: RootState) => state.itemsReducer.value
-  );
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -37,24 +30,6 @@ export default function LeftMenuBtn({ children }: LeftMenuBtnProps) {
   //   Function to toggle visibility of items
   const toggleItems = () => {
     setShowItems(!showItems);
-  };
-
-  //   Function to handle creating a new item
-  const newItem = () => {
-    const newItem: Item = {
-      id: generateId(),
-      title: "",
-      body: "",
-    };
-    router.push(`/note/${newItem.id}`);
-
-    // Dispatch action to update Redux store with new items
-    dispatch(updateItems([...items, newItem]));
-    localStorage.setItem("items", JSON.stringify([...items, newItem]));
-  };
-
-  const generateId = (): string => {
-    return Math.random().toString(36).substring(2, 9);
   };
 
   //   Function to handle mouse entry event
@@ -85,15 +60,14 @@ export default function LeftMenuBtn({ children }: LeftMenuBtnProps) {
         </button>
 
         {/* Button for creating new item */}
-        <button
-          onClick={newItem}
+        <AddItemButton
           className={`${
             hovered ? "flex" : "hidden"
           } absolute top-[5.4px] right-0`}
         >
           {/* Plus icon */}
           <BsPlusLg className="w-5 h-5 mr-3 p-[2px] rounded-sm transition-all hover:bg-slate-300" />
-        </button>
+        </AddItemButton>
       </div>
 
       {/* Rendering NotesList component if showItems is true */}
